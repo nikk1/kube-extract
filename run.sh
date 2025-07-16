@@ -4,20 +4,22 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+CYAN='\033[1;36m'
+MAGENTA='\033[1;35m'
 BOLD='\033[1m'
-NC='\033[0m' # No Color
+NC='\033[0m' # No Color code
 
-# How to use it
+# Print when no paramenter are passed
 usage() {
-  echo "Usage: $0 [-c | -i | -s]"
-  echo "  -c    Extract ConfigMaps"
-  echo "  -i    Extract Ingresses"
-  echo "  -s    Extract Secrets"
-  echo "  -d    Extract Deployments"
-  echo "  -v    Extract Services"
-  echo "  -ds   Extract DaemonSets"
-  echo " -so    Extract ScaledObjects"
-
+  echo -e "${BOLD}Usage:${NC} $0 [option]"
+  echo -e "  ${CYAN}-c${NC}    Extract ${BOLD}ConfigMaps${NC}"
+  echo -e "  ${CYAN}-i${NC}    Extract ${BOLD}Ingresses${NC}"
+  echo -e "  ${CYAN}-s${NC}    Extract ${BOLD}Secrets${NC}"
+  echo -e "  ${CYAN}-d${NC}    Extract ${BOLD}Deployments${NC}"
+  echo -e "  ${CYAN}-v${NC}    Extract ${BOLD}Services${NC}"
+  echo -e "  ${CYAN}-ds${NC}   Extract ${BOLD}DaemonSets${NC}"
+  echo -e "  ${CYAN}-so${NC}   Extract ${BOLD}ScaledObjects${NC}"
   exit 1
 }
 
@@ -38,7 +40,7 @@ main() {
       outdir="ingress"
       ;;
     -s)
-      resource="Secret"
+      resource="secret"
       outdir="secret"
       ;;
    -d)
@@ -123,6 +125,7 @@ extract_resources() {
     yq eval 'del(
       .metadata.managedFields,
       .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+      .metadata.annotations."deployment.kubernetes.io/revision",
       .metadata.creationTimestamp,
       .metadata.resourceVersion,
       .metadata.uid,
