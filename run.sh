@@ -20,6 +20,7 @@ usage() {
   echo -e "  ${CYAN}-v${NC}    Extract ${BOLD}Services${NC}"
   echo -e "  ${CYAN}-ds${NC}   Extract ${BOLD}DaemonSets${NC}"
   echo -e "  ${CYAN}-so${NC}   Extract ${BOLD}ScaledObjects${NC}"
+  echo -e "  ${CYAN}-st${NC}   Extract ${BOLD}StatefulSets${NC}"
   exit 1
 }
 
@@ -59,6 +60,10 @@ main() {
     -so)
         resource="ScaledObject"
         outdir="scaledobject"
+        ;;
+    -st)
+        resource="StatefulSet"
+        outdir="statefulset"
         ;;
     *)
       usage
