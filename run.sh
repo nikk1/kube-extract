@@ -21,6 +21,7 @@ usage() {
   echo -e "  ${CYAN}-ds${NC}   Extract ${BOLD}DaemonSets${NC}"
   echo -e "  ${CYAN}-so${NC}   Extract ${BOLD}ScaledObjects${NC}"
   echo -e "  ${CYAN}-st${NC}   Extract ${BOLD}StatefulSets${NC}"
+  echo -e "  ${CYAN}-pd${NC}   Extract ${BOLD}PodDisruptionBudget${NC}"
   exit 1
 }
 
@@ -65,6 +66,11 @@ main() {
         resource="StatefulSet"
         outdir="statefulset"
         ;;
+
+    -pd) # This option is not defined in the original script, but added for completeness
+      resource="PodDisruptionBudget"
+      outdir="pdb"
+      ;;
     *)
       usage
       ;;
