@@ -13,15 +13,25 @@ NC='\033[0m' # No Color code
 # Print when no paramenter are passed
 usage() {
   echo -e "${BOLD}Usage:${NC} $0 [option]"
-  echo -e "  ${CYAN}-c${NC}    Extract ${BOLD}ConfigMaps${NC}"
-  echo -e "  ${CYAN}-i${NC}    Extract ${BOLD}Ingresses${NC}"
-  echo -e "  ${CYAN}-s${NC}    Extract ${BOLD}Secrets${NC}"
-  echo -e "  ${CYAN}-d${NC}    Extract ${BOLD}Deployments${NC}"
-  echo -e "  ${CYAN}-v${NC}    Extract ${BOLD}Services${NC}"
-  echo -e "  ${CYAN}-ds${NC}   Extract ${BOLD}DaemonSets${NC}"
-  echo -e "  ${CYAN}-so${NC}   Extract ${BOLD}ScaledObjects${NC}"
-  echo -e "  ${CYAN}-st${NC}   Extract ${BOLD}StatefulSets${NC}"
-  echo -e "  ${CYAN}-pd${NC}   Extract ${BOLD}PodDisruptionBudget${NC}"
+  echo -e "  ${CYAN}-a${NC}      Extract ${BOLD}All resources${NC}"
+  echo -e "  ${CYAN}-c${NC}      Extract ${BOLD}ConfigMaps${NC}"
+  echo -e "  ${CYAN}-i${NC}      Extract ${BOLD}Ingresses${NC}"
+  echo -e "  ${CYAN}-s${NC}      Extract ${BOLD}Secrets${NC}"
+  echo -e "  ${CYAN}-d${NC}      Extract ${BOLD}Deployments${NC}"
+  echo -e "  ${CYAN}-v${NC}      Extract ${BOLD}Services${NC}"
+  echo -e "  ${CYAN}-ds${NC}     Extract ${BOLD}DaemonSets${NC}"
+  echo -e "  ${CYAN}-so${NC}     Extract ${BOLD}ScaledObjects${NC}"
+  echo -e "  ${CYAN}-st${NC}     Extract ${BOLD}StatefulSets${NC}"
+  echo -e "  ${CYAN}-pd${NC}     Extract ${BOLD}PodDisruptionBudget${NC}"
+  echo -e "  ${CYAN}-cj${NC}     Extract ${BOLD}CronJobs${NC}"
+  echo -e "  ${CYAN}-pvc${NC}    Extract ${BOLD}PersistentVolumeClaims${NC}"
+  echo -e "  ${CYAN}-pv${NC}     Extract ${BOLD}PersistentVolumes${NC}"
+  echo -e "  ${CYAN}-role${NC}   Extract ${BOLD}Roles${NC}"
+  echo -e "  ${CYAN}-rb${NC}     Extract ${BOLD}RoleBindings${NC}"
+  echo -e "  ${CYAN}-cr${NC}     Extract ${BOLD}ClusterRoles${NC}"
+  echo -e "  ${CYAN}-crb${NC}    Extract ${BOLD}ClusterRoleBindings${NC}"
+
+
   exit 1
 }
 
@@ -33,47 +43,65 @@ main() {
 
   # Determine resource and output folder
   case "$1" in
-    -c)
-      resource="configmap"
-      outdir="config"
-      ;;
-    -i)
-      resource="ingress"
-      outdir="ingress"
-      ;;
-    -s)
-      resource="secret"
-      outdir="secret"
-      ;;
-   -d)
-      resource="Deployment"
-      outdir="deployment"
-      ;;
-   -v)
-        resource="Service"
-        outdir="service"
-        ;;
-   -ds)
-        resource="DaemonSet"
-        outdir="daemonset"
-        ;;
+    -a)
+         all_resources=(
+            configmap ingress secret deployment service daemonset scaledobject statefulset poddisruptionbudget cronjob
+            namespace persistentvolumeclaim persistentvolume endpoints serviceaccount role rolebinding clusterrole clusterrolebinding
+            networkpolicy horizontalpodautoscaler limitrange resourcequota event customresourcedefinition
+          )
+          for res in "${all_resources[@]}"; do
+                # Map resource to outdir
+                case "$res" in
+                  configmap) outdir="config" ;;
+                  ingress) outdir="ingress" ;;
+                  secret) outdir="secret" ;;
+                  deployment) outdir="deployment" ;;
+                  service) outdir="service" ;;
+                  daemonset) outdir="daemonset" ;;
+                  scaledobject) outdir="scaledobject" ;;
+                  statefulset) outdir="statefulset" ;;
+                  poddisruptionbudget) outdir="pdb" ;;
+                  cronjob) outdir="cronjob" ;;
+                  namespace) outdir="namespace" ;;
+                  persistentvolumeclaim) outdir="pvc" ;;
+                  persistentvolume) outdir="pv" ;;
+                  endpoints) outdir="endpoints" ;;
+                  serviceaccount) outdir="serviceaccount" ;;
+                  role) outdir="role" ;;
+                  rolebinding) outdir="rolebinding" ;;
+                  clusterrole) outdir="clusterrole" ;;
+                  clusterrolebinding) outdir="clusterrolebinding" ;;
+                  networkpolicy) outdir="networkpolicy" ;;
+                  horizontalpodautoscaler) outdir="hpa" ;;
+                  limitrange) outdir="limitrange" ;;
+                  resourcequota) outdir="resourcequota" ;;
+                  event) outdir="event" ;;
+                  customresourcedefinition) outdir="crd" ;;
+                esac
 
-    -so)
-        resource="ScaledObject"
-        outdir="scaledobject"
-        ;;
-    -st)
-        resource="StatefulSet"
-        outdir="statefulset"
-        ;;
-
-    -pd) # This option is not defined in the original script, but added for completeness
-      resource="PodDisruptionBudget"
-      outdir="pdb"
-      ;;
-    *)
-      usage
-      ;;
+                mkdir -p "$outdir"
+                echo -e "${CYAN}🔹 Extracting ${res}s...${NC}"
+                extract_resources "$res" "$outdir"
+            done
+            echo -e "${GREEN}✔ All resources extracted.${NC}"
+            exit 0;;
+    -c) resource="configmap"; outdir="config" ;;
+    -i) resource="ingress"; outdir="ingress" ;;
+    -s) resource="secret"; outdir="secret" ;;
+    -d) resource="deployment"; outdir="deployment" ;;
+    -v) resource="service"; outdir="service" ;;
+    -ds) resource="daemonset"; outdir="daemonset" ;;
+    -so) resource="scaledobject"; outdir="scaledobject" ;;
+    -st) resource="statefulset"; outdir="statefulset" ;;
+    -pd) resource="poddisruptionbudget"; outdir="pdb" ;;
+    -cj) resource="cronjob"; outdir="cronjob" ;;
+    -pvc) resource="persistentvolumeclaim"; outdir="pvc" ;;
+    -pv) resource="persistentvolume"; outdir="pv" ;;
+    -role) resource="role"; outdir="role" ;;
+    -rb) resource="rolebinding"; outdir="rolebinding" ;;
+    -cr) resource="clusterrole"; outdir="clusterrole" ;;
+    -crb) resource="clusterrolebinding"; outdir="clusterrolebinding" ;;
+    *) usage ;;
   esac
 
   confirm_namespace "$resource"
